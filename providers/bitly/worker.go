@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -12,14 +14,15 @@ import (
 
 func (us *UrlServiceConfig) TransformUrl(ctx context.Context, longUrl string) (string, error) {
 	var requestBody = PostShortUrlRequestBody{LongUrl: longUrl, Domain: us.Domain}
-	var bearerToken = "Bearer" + us.Token
+	var bearerToken = "Bearer " + us.Token
 	jsonRequestBody, err := json.Marshal(requestBody)
 	if err != nil {
 		logging.EasyLogError("providers", "bitly: error, failed to marshal request body",
 			" for method POST /shorten", err)
 		return "", err
 	}
-	url := us.URL + "shorten"
+	url := fmt.Sprintf("%sshorten", us.URL)
+	fmt.Println("REQUEST URL: ", url)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonRequestBody))
 	if err != nil {
 		logging.EasyLogError("providers", "bitly: failed to create new request for method: ",
@@ -30,6 +33,12 @@ func (us *UrlServiceConfig) TransformUrl(ctx context.Context, longUrl string) (s
 	req.Header.Add("Content-Type", "application/json")
 	client := http.Client{}
 	resp, err := client.Do(req)
+	if resp.Status != "200 OK" {
+		err = errors.New(resp.Status)
+		logging.EasyLogError("providers", "bitly: failed to get response for method: ",
+			"POST /shorten, got status: ", err)
+		return "", err
+	}
 	if err != nil {
 		logging.EasyLogError("providers", "bitly: failed to get response for method: ",
 			"POST /shorten", err)
@@ -55,12 +64,12 @@ func (us *UrlServiceConfig) TransformUrl(ctx context.Context, longUrl string) (s
 			"POST /shorten", err)
 		return "", err
 	}
-	return formattedRespBody.LongURL, nil
+	return formattedRespBody.Link, nil
 }
 
 func (us *UrlServiceConfig) ReTransformUrl(ctx context.Context, bitlinkId string) (string, error) {
 	var requestBody = PostExpandRequestBody{BitlinkId: bitlinkId}
-	var bearerToken = "Bearer" + us.Token
+	var bearerToken = "Bearer " + us.Token
 	jsonRequestBody, err := json.Marshal(requestBody)
 	if err != nil {
 		logging.EasyLogError("providers", "bitly: error, failed to marshal request body ",
@@ -102,6 +111,9 @@ func (us *UrlServiceConfig) ReTransformUrl(ctx context.Context, bitlinkId string
 		logging.EasyLogError("providers", "bitly: failed to parse response body into structure for method: ",
 			"POST /shorten", err)
 		return "", err
+	}
+	if expandResponse.LongURL == "" {
+		return "", errors.New("failed to get full url")
 	}
 	return expandResponse.LongURL, nil
 }
