@@ -1,21 +1,23 @@
 package bitly
 
+import "context"
+
 type UrlService interface {
-	TransformUrl(longUrl string) (string, error)
-	ReTransformUrl(modUrl string) (string, error)
+	TransformUrl(ctx context.Context, longUrl string) (string, error)
+	ReTransformUrl(ctx context.Context, modUrl string) (string, error)
 }
 
 type UrlServiceConfig struct {
-	Token     string
-	GroupGuid string
-	Domain    string
+	Token  string
+	URL    string
+	Domain string
 }
 
 func NewUrlServiceConfiguration(token, guid, domain string) *UrlServiceConfig {
 	return &UrlServiceConfig{
-		Token:     token,
-		GroupGuid: guid,
-		Domain:    domain,
+		Token:  token,
+		URL:    guid,
+		Domain: domain,
 	}
 }
 

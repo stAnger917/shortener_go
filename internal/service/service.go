@@ -1,14 +1,17 @@
 package service
 
-import "shortener/providers/bitly"
+import (
+	"context"
+	"shortener/providers/bitly"
+)
 
 type Services struct {
 	UrlService UrlService
 }
 
 type UrlService interface {
-	TransformUrl(longUrl string) (string, error)
-	ReTransformUrl(modUrl string) (string, error)
+	TransformUrl(ctx context.Context, longUrl string) (string, error)
+	ReTransformUrl(ctx context.Context, modUrl string) (string, error)
 }
 
 type Deps struct {

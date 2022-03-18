@@ -16,9 +16,9 @@ type (
 	}
 
 	ProviderCfg struct {
-		Token     string
-		GroupGuid string
-		Domain    string
+		Token  string
+		URL    string
+		Domain string
 	}
 
 	HTTPConfig struct {
@@ -89,9 +89,9 @@ func InitProviderConfig(envPath string) ProviderCfg {
 		Configuration.Token = providerToken
 	}
 
-	providerGuid, exists := os.LookupEnv("BITLY_GROUP_GUID")
+	providerURL, exists := os.LookupEnv("BITLY_URL")
 	if exists {
-		Configuration.GroupGuid = providerGuid
+		Configuration.URL = providerURL
 	}
 	providerDomain, exists := os.LookupEnv("BITLY_DOMAIN")
 	if exists {
