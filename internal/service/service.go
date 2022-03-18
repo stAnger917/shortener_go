@@ -11,7 +11,7 @@ type Services struct {
 
 type UrlService interface {
 	TransformUrl(ctx context.Context, longUrl string) (string, error)
-	ReTransformUrl(ctx context.Context, modUrl string) (string, error)
+	ReTransformUrl(ctx context.Context, bitlinkId string) (string, error)
 }
 
 type Deps struct {

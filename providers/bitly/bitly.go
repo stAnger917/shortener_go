@@ -4,7 +4,7 @@ import "context"
 
 type UrlService interface {
 	TransformUrl(ctx context.Context, longUrl string) (string, error)
-	ReTransformUrl(ctx context.Context, modUrl string) (string, error)
+	ReTransformUrl(ctx context.Context, bitlinkId string) (string, error)
 }
 
 type UrlServiceConfig struct {
@@ -25,8 +25,8 @@ type ModUrlService struct {
 	ServiceManager UrlService
 }
 
-func NewUrlService(token, guid, domain string) *ModUrlService {
+func NewUrlService(token, url, domain string) *ModUrlService {
 	return &ModUrlService{
-		ServiceManager: NewUrlServiceConfiguration(token, guid, domain),
+		ServiceManager: NewUrlServiceConfiguration(token, url, domain),
 	}
 }
